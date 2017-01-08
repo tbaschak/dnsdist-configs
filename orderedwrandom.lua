@@ -1,24 +1,25 @@
--- dnsdist server policy - orderedLeastOutstanding
--- Retrieved from: https://github.com/sysadminblog/dnsdist-configs/
+-- dnsdist server policy - orderedwrandom
+-- Retrieved from: https://github.com/tbaschak/dnsdist-configs/
+-- Forked from: https://github.com/sysadminblog/dnsdist-configs/
 --
--- This function is a server policy very similar to the build in policy "leastOutstanding".
+-- This function is a server policy very similar to the build in policy "wrandom".
 -- The difference is this function will take the server server orders into account before
 -- distributing queries to the appropriate servers in a pool. My use case for this is I have
 -- 3 DNS servers. I want only two servers to take all queries, the third server should only
 -- be used in the situation that the two primary servers are down.
 --
 -- To use this:
---	1. Copy the orderedLeastOutstanding.lua file to /etc/dnsdist/
+--	1. Copy the orderedwrandom.lua file to /etc/dnsdist/
 --	2. Edit dnsdist.conf and set the following:
---		- Tell dnsdist to run the orderedLeastOutstanding.lua code: dofile('/etc/dnsdist/orderedLeastOutstanding.lua')
---		- Set the server policy: setServerPolicyLua("orderedLeastOutstanding", orderedLeastOutstanding)
+--		- Tell dnsdist to run the orderedwrandom.lua code: dofile('/etc/dnsdist/orderedwrandom.lua')
+--		- Set the server policy: setServerPolicyLua("orderedwrandom", orderedwrandom)
 --		- Ensure that the servers have an appropriate order set
 --
 -- As an example, with 3 DNS servers you want all queries to go to "dns1" and "dns2" when they are up.
 -- If they are both down, then queries should go to "dns3". The configuration would look like:
 --
--- dofile('/etc/dnsdist/orderedLeastOutstanding.lua')
--- setServerPolicyLua("orderedLeastOutstanding", orderedLeastOutstanding)
+-- dofile('/etc/dnsdist/orderedwrandom.lua')
+-- setServerPolicyLua("orderedwrandom", orderedwrandom)
 --
 -- newServer({address="192.168.1.1:5356", name="dns1", pool="recursor", checkType="A", checkName="a.root-servers.net.", mustResolve=true, tcpRecvTimeout=10, tcpSendTimeout=10, retries=5, useClientSubnet=true, order=1})
 -- newServer({address="192.168.1.2:5356", name="dns2", pool="recursor", checkType="A", checkName="a.root-servers.net.", mustResolve=true, tcpRecvTimeout=10, tcpSendTimeout=10, retries=5, useClientSubnet=true, order=1})
@@ -26,7 +27,7 @@
 --
 -- Please report any bugs on GitHub.
 
-function orderedLeastOutstanding(servers, dq)
+function orderedwrandom(servers, dq)
 
 	-- If there is only one or 0 servers in the table, return it to stop further processing
 	if (#servers == 0 or #servers == 1) then
@@ -76,10 +77,10 @@ function orderedLeastOutstanding(servers, dq)
 	-- ever happen, but you can't be too safe. If it has no value, then return the server
 	-- list.
 	if serverlist[lowest] == nil then
-		return leastOutstanding.policy(servers, dq)
+		return wrandom.policy(servers, dq)
 	end
 
 	-- Return the lowest ordered server list to the leastOutstanding function
-	return leastOutstanding.policy(serverlist[lowest], dq)
+	return wrandom.policy(serverlist[lowest], dq)
 
 end
