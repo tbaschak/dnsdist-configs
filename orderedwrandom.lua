@@ -35,17 +35,17 @@ function orderedwrandom(servers, dq)
 	end
 
 	-- Create server list table
-	serverlist = {}
+	local serverlist = {}
 
 	-- Loop over each server for the pool
-	i = 1
+	local i = 1
 	while servers[i] do
 
 		-- We only care if the server is currently up
 		if (servers[i].upStatus == true) then
 
 			-- Retrieve the order for the server
-			order = servers[i].order
+			local order = servers[i].order
 
 			-- Create table for this order if not existing
 			if type(serverlist[order]) ~= "table" then
@@ -63,6 +63,7 @@ function orderedwrandom(servers, dq)
 	end
 
 	-- Get the lowest key in the table so that we use the lowest ordered server(s)
+  local lowest = nil
 	for k,v in pairs (serverlist) do
 		if lowest == nil then
 			lowest = k
